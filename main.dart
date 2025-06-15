@@ -1,19 +1,10 @@
-import 'package:berber_proje/Admin/admin_login.dart';
-import 'package:berber_proje/Admin/booking_admin.dart';
-import 'package:berber_proje/pages/booking.dart';
-import 'package:berber_proje/pages/forgot_password.dart';
-import 'package:berber_proje/pages/home.dart';
-import 'package:berber_proje/pages/login.dart';
 import 'package:berber_proje/pages/onBoarding.dart';
-import 'package:berber_proje/pages/signup.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 /*
-  birden fazla berber seçme ekle 
-
-
+  randevuları listview halinde göster allınan randevuya randevu verme  
+  giriş yaptığında shared preferencesi o kullanıcıya yani current olarak ata
 
 */
 void main() async {
@@ -28,12 +19,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Flutter Demo',
+        title: 'Berber App',
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        home: SignUp());
+        home: onBoarding());
   }
 }
 

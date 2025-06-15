@@ -18,7 +18,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email!);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(
-          "Password reset Email has been sent!",
+          "Şifre sıfırlama e-postası gönderildi!",
           style: TextStyle(fontSize: 20.0),
         ),
       ));
@@ -26,7 +26,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       if (e.code == "user-not-found") {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(
-            "Bo user found for the email",
+            "Bu e-posta adresine ait kullanıcı bulunamadı",
             style: TextStyle(fontSize: 20.0),
           ),
         ));
@@ -41,13 +41,30 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       body: Container(
         child: Column(
           children: [
+            SizedBox(height: 100.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(width: 20.0),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    color: Colors.white,
+                    size: 30.0,
+                  ),
+                ),
+              ],
+            ),
             SizedBox(
-              height: 50.0,
+              height: 20.0,
             ),
             Container(
               alignment: Alignment.topCenter,
               child: Text(
-                "Password Recovery",
+                "Şifre Kurtarma",
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: 30.0,
@@ -58,7 +75,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
               height: 10.0,
             ),
             Text(
-              "Enter your mail",
+              "E-postanızı girin",
               style: TextStyle(
                   color: Colors.white,
                   fontSize: 30.0,
@@ -78,14 +95,14 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 child: TextFormField(
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please Enter Email';
+                      return 'Lütfen e-posta adresinizi girin';
                     }
                     return null;
                   },
                   style: TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     border: InputBorder.none,
-                    hintText: "Email",
+                    hintText: "E-posta",
                     hintStyle: TextStyle(fontSize: 18.0, color: Colors.white),
                     prefixIcon: Icon(
                       Icons.mail_outline,
@@ -113,7 +130,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     color: Color(0xFFdf711a),
                     borderRadius: BorderRadius.circular(10)),
                 child: Text(
-                  "Send Email",
+                  "E-posta Gönder",
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 20.0,

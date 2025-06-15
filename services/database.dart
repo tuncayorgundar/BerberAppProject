@@ -24,4 +24,38 @@ class DatabaseMethods {
         .doc(id)
         .delete();
   }
+
+  Future<Stream> getAdmins() async {
+    return FirebaseFirestore.instance.collection('Admin').snapshots();
+  }
+
+  Future<Stream<QuerySnapshot>> getBookingsForAdmin(
+      String? adminUsername) async {
+    return FirebaseFirestore.instance
+        .collection('Booking')
+        .where('AdminName', isEqualTo: adminUsername)
+        .snapshots();
+  }
+
+  Future<Stream<QuerySnapshot>> getBookingsForUsers(String? Username) async {
+    return FirebaseFirestore.instance
+        .collection('Booking')
+        .where('Username', isEqualTo: Username)
+        .snapshots();
+  }
+
+  Future<Map<String, dynamic>?> getLastBookingForUser(String username) async {
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('Booking')
+        .where('Username', isEqualTo: username)
+        .orderBy('Date', descending: true)
+        .limit(1)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      return querySnapshot.docs.first.data();
+    } else {
+      return null;
+    }
+  }
 }

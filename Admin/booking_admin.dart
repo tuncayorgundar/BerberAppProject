@@ -1,4 +1,5 @@
 import 'package:berber_proje/services/database.dart';
+import 'package:berber_proje/services/shared_pref.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -13,7 +14,9 @@ class _BookingAdminState extends State<BookingAdmin> {
   Stream? BookingStream;
 
   getontheload() async {
-    BookingStream = await DatabaseMethods().getBookings();
+    String? adminUsername = await SharedPreferenceHelper().getAdminName();
+
+    BookingStream = await DatabaseMethods().getBookingsForAdmin(adminUsername);
     setState(() {});
   }
 
@@ -56,7 +59,7 @@ class _BookingAdminState extends State<BookingAdmin> {
                               children: [
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(60),
-                                  child: Image.network(
+                                  child: Image.asset(
                                     ds['Image'],
                                     height: 75,
                                     width: 75,
@@ -69,35 +72,35 @@ class _BookingAdminState extends State<BookingAdmin> {
                               height: 10.0,
                             ),
                             Text(
-                              "Service :  " + ds["Service"],
+                              "Hizmet:  " + ds["Service"],
                               style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 20.0,
                                   fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              "Name :  " + ds['Username'],
+                              "Adı:  " + ds['Username'],
                               style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 20.0,
                                   fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              "Date :  " + ds['Date'],
+                              "Tarih:  " + ds['Date'],
                               style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 20.0,
                                   fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              "Time :  " + ds['Time'],
+                              "Saat:  " + ds['Time'],
                               style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 20.0,
                                   fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              "Phone :  " + ds['Phone'],
+                              "Telefon:  " + ds['Phone'],
                               style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 20.0,
@@ -116,7 +119,7 @@ class _BookingAdminState extends State<BookingAdmin> {
                                     color: Color(0xFFdf711a),
                                     borderRadius: BorderRadius.circular(10)),
                                 child: Text(
-                                  "Done",
+                                  "Tamamlandı",
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 20.0,
@@ -164,7 +167,7 @@ class _BookingAdminState extends State<BookingAdmin> {
             ),
             Center(
               child: Text(
-                "All Bookings",
+                "Tüm Randevular",
                 style: TextStyle(
                     color: Colors.black,
                     fontSize: 20.0,

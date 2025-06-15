@@ -1,4 +1,5 @@
 import 'package:berber_proje/services/database.dart';
+import 'package:berber_proje/services/shared_pref.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +15,10 @@ class _bookings_pageState extends State<bookings_page> {
 
   @override
   getontheload() async {
-    BookingStream = await DatabaseMethods().getBookings();
+    final String? userId = await SharedPreferenceHelper().getUserId();
+    String? Username = await SharedPreferenceHelper().getUserName(userId!);
+
+    BookingStream = await DatabaseMethods().getBookingsForUsers(Username);
     setState(() {});
   }
 
@@ -57,7 +61,7 @@ class _bookings_pageState extends State<bookings_page> {
                               children: [
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(60),
-                                  child: Image.network(
+                                  child: Image.asset(
                                     ds['Image'],
                                     height: 75,
                                     width: 75,
@@ -70,35 +74,42 @@ class _bookings_pageState extends State<bookings_page> {
                               height: 10.0,
                             ),
                             Text(
-                              "Service :  " + ds["Service"],
+                              "Hizmet:  " + ds["Service"],
                               style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 20.0,
                                   fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              "Name :  " + ds['Username'],
+                              "Adı:  " + ds['Username'],
                               style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 20.0,
                                   fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              "Date :  " + ds['Date'],
+                              "Tarih:  " + ds['Date'],
                               style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 20.0,
                                   fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              "Time :  " + ds['Time'],
+                              "Saat:  " + ds['Time'],
                               style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 20.0,
                                   fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              "Phone :  " + ds['Phone'],
+                              "Telefon:  " + ds['Phone'],
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20.0,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              "Berber Adı:  " + ds['AdminName'],
                               style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 20.0,
@@ -117,7 +128,7 @@ class _bookings_pageState extends State<bookings_page> {
                                     color: Color(0xFFdf711a),
                                     borderRadius: BorderRadius.circular(10)),
                                 child: Text(
-                                  "Done",
+                                  "İptal Et",
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 20.0,
@@ -126,7 +137,7 @@ class _bookings_pageState extends State<bookings_page> {
                               ),
                             ),
                             SizedBox(
-                              height: 20.0,
+                              height: 10.0,
                             ),
                           ],
                         ),
@@ -164,7 +175,7 @@ class _bookings_pageState extends State<bookings_page> {
                   width: 80.0,
                 ),
                 Text(
-                  "All Bookings",
+                  "Tüm Randevular",
                   style: TextStyle(
                       color: Colors.black,
                       fontSize: 30.0,

@@ -1,16 +1,36 @@
+import 'dart:math';
 import 'package:berber_proje/pages/home.dart';
 import 'package:berber_proje/pages/login.dart';
 import 'package:berber_proje/services/database.dart';
 import 'package:berber_proje/services/shared_pref.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:random_string/random_string.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
 
   @override
   State<SignUp> createState() => _SignUpState();
+}
+
+class ProfileImageHelper {
+  // Tüm profil resimlerinin listesi
+  static final List<String> profileImages = [
+    'images/profiles/profile1.png',
+    'images/profiles/profile2.png',
+    'images/profiles/profile3.png',
+    'images/profiles/profile4.png',
+    'images/profiles/profile5.png',
+    'images/profiles/profile6.png',
+    'images/profiles/profile7.png',
+    'images/profiles/profile8.png',
+    'images/profiles/profile9.png',
+  ];
+
+  // Rastgele profil resmi seçme metodu
+  static String getRandomProfileImage() {
+    return profileImages[Random().nextInt(profileImages.length)];
+  }
 }
 
 class _SignUpState extends State<SignUp> {
@@ -26,28 +46,33 @@ class _SignUpState extends State<SignUp> {
   registration() async {
     if (password != null && name != null && mail != null) {
       try {
+        String randomProfileImage = ProfileImageHelper.getRandomProfileImage();
+
         UserCredential userCredential = await FirebaseAuth.instance
             .createUserWithEmailAndPassword(email: mail!, password: password!);
-        String id = randomAlphaNumeric(10);
-        await SharedPreferenceHelper().saveUserName(namecontroller.text);
-        await SharedPreferenceHelper().saveUserEmail(emailcontroller.text);
-        await SharedPreferenceHelper().saveUserImage(
-            "https://firebasestorage.googleapis.com/v0/b/barberapp-ebcc1.appspot.com/o/icon1.png?alt=media&token=0fad24a5-a01b-4d67-b4a0-676fbc75b34a");
-        await SharedPreferenceHelper().saveUserId(id);
+
+        User? user = userCredential.user;
+        //String id = randomAlphaNumeric(10);
         await SharedPreferenceHelper()
-            .saveUserPhone(phonenumbercontroller.text);
+            .saveUserName(namecontroller.text, user!.uid);
+        await SharedPreferenceHelper()
+            .saveUserEmail(emailcontroller.text, user.uid);
+        await SharedPreferenceHelper()
+            .saveUserImage(randomProfileImage, user.uid);
+        await SharedPreferenceHelper().saveUserId(user.uid);
+        await SharedPreferenceHelper()
+            .saveUserPhone(phonenumbercontroller.text, user.uid);
         Map<String, dynamic> userInfoMap = {
           "Name": namecontroller.text,
           "Email": emailcontroller.text,
-          "id": id,
-          "Image":
-              "https://firebasestorage.googleapis.com/v0/b/barberapp-ebcc1.appspot.com/o/icon1.png?alt=media&token=0fad24a5-a01b-4d67-b4a0-676fbc75b34a",
+          "id": user.uid,
+          "Image": randomProfileImage,
           "Phone": phonenumbercontroller.text,
         };
-        await DatabaseMethods().addUserDetails(userInfoMap, id);
+        await DatabaseMethods().addUserDetails(userInfoMap, user.uid);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(
-            "Registered Successfully",
+            "Başarıyla Kayıt Oldunuz",
             style: TextStyle(fontSize: 20.0),
           ),
         ));
@@ -57,14 +82,14 @@ class _SignUpState extends State<SignUp> {
         if (e.code == 'weak-password') {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(
-              "Password provided is too weak",
+              "Şifre çok zayıf",
               style: TextStyle(fontSize: 20.0),
             ),
           ));
         } else if (e.code == 'email-already-in-use') {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(
-              "Account Already exist",
+              "Bu e-posta zaten kullanımda",
               style: TextStyle(fontSize: 20.0),
             ),
           ));
@@ -89,7 +114,7 @@ class _SignUpState extends State<SignUp> {
                 Color(0xFF621d3c),
                 Color(0xFF311937)
               ])),
-              child: Text("Create Your\nAccount",
+              child: Text("Hesabınızı\nOluşturun",
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 40.0,
@@ -111,7 +136,7 @@ class _SignUpState extends State<SignUp> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Name",
+                    Text("Adınız",
                         style: TextStyle(
                             color: Color(0xFFB91635),
                             fontSize: 15.0,
@@ -119,19 +144,19 @@ class _SignUpState extends State<SignUp> {
                     TextFormField(
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please Enter Name';
+                          return 'Lütfen adınızı girin';
                         }
                         return null;
                       },
                       controller: namecontroller,
                       decoration: InputDecoration(
-                          hintText: "Name",
+                          hintText: "Adınız",
                           prefixIcon: Icon(Icons.person_outline)),
                     ),
                     SizedBox(
                       height: 10.0,
                     ),
-                    Text("Gmail",
+                    Text("E-posta",
                         style: TextStyle(
                             color: Color(0xFFB91635),
                             fontSize: 15.0,
@@ -139,19 +164,19 @@ class _SignUpState extends State<SignUp> {
                     TextFormField(
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please Enter Email';
+                          return 'Lütfen e-posta adresinizi girin';
                         }
                         return null;
                       },
                       controller: emailcontroller,
                       decoration: InputDecoration(
-                          hintText: "Gmail",
+                          hintText: "E-posta",
                           prefixIcon: Icon(Icons.mail_outline)),
                     ),
                     SizedBox(
                       height: 10.0,
                     ),
-                    Text("PhoneNumber",
+                    Text("Telefon Numarası",
                         style: TextStyle(
                             color: Color(0xFFB91635),
                             fontSize: 15.0,
@@ -159,20 +184,20 @@ class _SignUpState extends State<SignUp> {
                     TextFormField(
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please Enter Phone Number';
+                          return 'Lütfen telefon numaranızı girin';
                         }
                         return null;
                       },
                       controller: phonenumbercontroller,
                       decoration: InputDecoration(
-                        hintText: "Phone Number",
+                        hintText: "Telefon Numarası",
                         prefixIcon: Icon(Icons.phone_android),
                       ),
                     ),
                     SizedBox(
                       height: 10.0,
                     ),
-                    Text("Password",
+                    Text("Şifre",
                         style: TextStyle(
                             color: Color(0xFFB91635),
                             fontSize: 15.0,
@@ -180,13 +205,13 @@ class _SignUpState extends State<SignUp> {
                     TextFormField(
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please Enter Password';
+                          return 'Lütfen şifrenizi girin';
                         }
                         return null;
                       },
                       controller: passwordcontroller,
                       decoration: InputDecoration(
-                        hintText: "Password",
+                        hintText: "Şifre",
                         prefixIcon: Icon(Icons.password_outlined),
                       ),
                       obscureText: true,
@@ -218,7 +243,7 @@ class _SignUpState extends State<SignUp> {
                             borderRadius: BorderRadius.circular(20)),
                         child: Center(
                           child: Text(
-                            "SIGN UP",
+                            "KAYIT OL",
                             style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 20.0,
@@ -232,7 +257,7 @@ class _SignUpState extends State<SignUp> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Text(
-                          "Already have an account?",
+                          "Zaten bir hesabınız var mı?",
                           style: TextStyle(
                               color: Color(0xFF311937),
                               fontSize: 15.0,
@@ -249,7 +274,7 @@ class _SignUpState extends State<SignUp> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Text(
-                            "Sign In",
+                            "Giriş Yap",
                             style: TextStyle(
                                 color: Color(0xFF621d3c),
                                 fontSize: 20.0,

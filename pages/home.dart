@@ -1,7 +1,7 @@
 import 'package:berber_proje/Admin/admin_login.dart';
-import 'package:berber_proje/Admin/booking_admin.dart';
 import 'package:berber_proje/pages/booking.dart';
 import 'package:berber_proje/pages/books.dart';
+import 'package:berber_proje/pages/profile.dart';
 import 'package:berber_proje/services/shared_pref.dart';
 import 'package:flutter/material.dart';
 
@@ -16,8 +16,9 @@ class _HomeState extends State<Home> {
   String? name, image;
 
   getTheDataFromSharedPref() async {
-    name = await SharedPreferenceHelper().getUserName();
-    image = await SharedPreferenceHelper().getUserImage();
+    final String? userId = await SharedPreferenceHelper().getUserId();
+    name = await SharedPreferenceHelper().getUserName(userId!);
+    image = await SharedPreferenceHelper().getUserImage(userId);
     setState(() {});
   }
 
@@ -48,34 +49,45 @@ class _HomeState extends State<Home> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Hello,",
+                          "Merhaba,",
                           style: TextStyle(
                               color: Color.fromARGB(197, 255, 255, 255),
                               fontSize: 24.0,
                               fontWeight: FontWeight.w500),
                         ),
                         Text(
-                          name ?? "Guest",
+                          name ?? "Misafir",
                           style: TextStyle(
                               color: Colors.white,
                               fontSize: 24.0,
                               fontWeight: FontWeight.bold),
                         )
                       ]),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: image != null
-                        ? Image.network(
-                            image!,
-                            height: 60,
-                            width: 60,
-                            fit: BoxFit.cover,
-                          )
-                        : Icon(
-                            Icons.person,
-                            size: 60,
-                            color: Colors.white,
-                          ), // Null ise bir ikon göster
+                  GestureDetector(
+                    onTap: () {
+                      // Profil sayfasına yönlendir
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ProfilePage(
+                                  name: name ?? "Misafir",
+                                  image: image ?? "")));
+                    },
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: image != null
+                          ? Image.asset(
+                              image!,
+                              height: 60,
+                              width: 60,
+                              fit: BoxFit.cover,
+                            )
+                          : Icon(
+                              Icons.person,
+                              size: 60,
+                              color: Colors.white,
+                            ), // Null ise bir ikon göster
+                    ),
                   )
                 ],
               ),
@@ -89,7 +101,7 @@ class _HomeState extends State<Home> {
                 height: 20.0,
               ),
               Text(
-                "Services",
+                "Hizmetler",
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: 24.0,
@@ -108,7 +120,7 @@ class _HomeState extends State<Home> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    Booking(service: 'Classic Shaving')));
+                                    Booking(service: 'Klasik Traş')));
                       },
                       child: Container(
                         padding: EdgeInsets.symmetric(horizontal: 10.0),
@@ -129,7 +141,7 @@ class _HomeState extends State<Home> {
                               height: 20.0,
                             ),
                             Text(
-                              "Classic Shaving",
+                              "Klasik Traş",
                               style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 20.0,
@@ -151,7 +163,7 @@ class _HomeState extends State<Home> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    Booking(service: 'Hair Washing')));
+                                    Booking(service: 'Saç Yıkama')));
                       },
                       child: Container(
                         height: 150,
@@ -171,7 +183,7 @@ class _HomeState extends State<Home> {
                               height: 20.0,
                             ),
                             Text(
-                              "Hair Washing",
+                              "Saç Yıkama",
                               style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 20.0,
@@ -197,7 +209,7 @@ class _HomeState extends State<Home> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    Booking(service: 'Hair Cutting')));
+                                    Booking(service: 'Saç Kesimi')));
                       },
                       child: Container(
                         padding: EdgeInsets.symmetric(horizontal: 10.0),
@@ -218,7 +230,7 @@ class _HomeState extends State<Home> {
                               height: 20.0,
                             ),
                             Text(
-                              "Hair Cutting",
+                              "Saç Kesimi",
                               style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 20.0,
@@ -240,7 +252,7 @@ class _HomeState extends State<Home> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    Booking(service: 'Beard Trimming')));
+                                    Booking(service: 'Sakal Tıraşı')));
                       },
                       child: Container(
                         height: 150,
@@ -260,7 +272,7 @@ class _HomeState extends State<Home> {
                               height: 20.0,
                             ),
                             Text(
-                              "Beard Trimming",
+                              "Sakal Tıraşı",
                               style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 20.0,
@@ -297,7 +309,7 @@ class _HomeState extends State<Home> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Image.asset(
-                              "images/facials.png",
+                              "images/admin_icon.png",
                               height: 60,
                               width: 60,
                               fit: BoxFit.cover,
@@ -306,7 +318,7 @@ class _HomeState extends State<Home> {
                               height: 20.0,
                             ),
                             Text(
-                              "Admin Page",
+                              "Berber Sayfası",
                               style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 20.0,
@@ -338,7 +350,7 @@ class _HomeState extends State<Home> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Image.asset(
-                              "images/kids.png",
+                              "images/books.png",
                               height: 60,
                               width: 60,
                               fit: BoxFit.cover,
@@ -347,7 +359,7 @@ class _HomeState extends State<Home> {
                               height: 20.0,
                             ),
                             Text(
-                              "Books",
+                              "Rezervasyonlar",
                               style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 20.0,

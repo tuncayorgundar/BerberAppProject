@@ -1,5 +1,7 @@
+import 'package:berber_proje/pages/forgot_password.dart';
 import 'package:berber_proje/pages/home.dart';
 import 'package:berber_proje/pages/signup.dart';
+import 'package:berber_proje/services/shared_pref.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -20,18 +22,31 @@ class _LoginState extends State<LogIn> {
 
   userLogin() async {
     try {
-      await FirebaseAuth.instance
+      UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: mail!, password: password!);
 
-      Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
+      // Giriş başarılı ise kullanıcı bilgilerini kaydet
+      User? user = userCredential.user;
+      if (user != null) {
+        // Kullanıcı ID'sini kaydet
+        await SharedPreferenceHelper().saveUserId(user.uid);
+        print(user.uid);
+
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => Home()));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("Bir hata oluştu!",
+                style: TextStyle(fontSize: 20.0, color: (Colors.black)))));
+      }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text("No user found for that Email",
+            content: Text("Bu e-posta adresine ait kullanıcı bulunamadı",
                 style: TextStyle(fontSize: 20.0, color: (Colors.black)))));
       } else if (e.code == 'wrong-password') {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text("Wrong Password provided by user",
+            content: Text("Yanlış şifre girdiniz",
                 style: TextStyle(fontSize: 20.0, color: (Colors.black)))));
       }
     }
@@ -53,7 +68,7 @@ class _LoginState extends State<LogIn> {
                 Color(0xFF621d3c),
                 Color(0xFF311937)
               ])),
-              child: Text("Hello\nSign in!",
+              child: Text("Merhaba\nGiriş Yap!",
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 30.0,
@@ -75,7 +90,7 @@ class _LoginState extends State<LogIn> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Gmail",
+                    Text("E-posta",
                         style: TextStyle(
                             color: Color(0xFFB91635),
                             fontSize: 20.0,
@@ -83,19 +98,19 @@ class _LoginState extends State<LogIn> {
                     TextFormField(
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please Enter Email';
+                          return 'Lütfen e-posta adresinizi girin';
                         }
                         return null;
                       },
                       controller: emailcontroller,
                       decoration: InputDecoration(
-                          hintText: "Gmail",
+                          hintText: "E-posta",
                           prefixIcon: Icon(Icons.mail_outline)),
                     ),
                     SizedBox(
                       height: 30.0,
                     ),
-                    Text("Password",
+                    Text("Şifre",
                         style: TextStyle(
                             color: Color(0xFFB91635),
                             fontSize: 20.0,
@@ -103,13 +118,13 @@ class _LoginState extends State<LogIn> {
                     TextFormField(
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please Enter Password';
+                          return 'Lütfen şifrenizi girin';
                         }
                         return null;
                       },
                       controller: passwordcontroller,
                       decoration: InputDecoration(
-                        hintText: "Password",
+                        hintText: "Şifre",
                         prefixIcon: Icon(Icons.password_outlined),
                       ),
                       obscureText: true,
@@ -120,15 +135,23 @@ class _LoginState extends State<LogIn> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Text("Forgot Password?",
-                            style: TextStyle(
-                                color: Color(0xFF311937),
-                                fontSize: 20.0,
-                                fontWeight: FontWeight.w500)),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ForgotPassword()));
+                          },
+                          child: Text("Şifremi Unuttum?",
+                              style: TextStyle(
+                                  color: Color(0xFF311937),
+                                  fontSize: 20.0,
+                                  fontWeight: FontWeight.w500)),
+                        ),
                       ],
                     ),
                     SizedBox(
-                      height: 20.0,
+                      height: 30.0,
                     ),
                     GestureDetector(
                       onTap: () {
@@ -152,7 +175,7 @@ class _LoginState extends State<LogIn> {
                             borderRadius: BorderRadius.circular(20)),
                         child: Center(
                           child: Text(
-                            "SIGN IN",
+                            "GİRİŞ YAP",
                             style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 25.0,
@@ -161,18 +184,24 @@ class _LoginState extends State<LogIn> {
                         ),
                       ),
                     ),
-                    Spacer(),
+                    //Spacer(),
+                    SizedBox(
+                      height: 40.0,
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Text(
-                          "Don't have account?",
+                          "Hesabınız yok mu?",
                           style: TextStyle(
                               color: Color(0xFF311937),
                               fontSize: 15.0,
                               fontWeight: FontWeight.w500),
                         ),
                       ],
+                    ),
+                    SizedBox(
+                      height: 10.0,
                     ),
                     GestureDetector(
                       onTap: () {
@@ -183,7 +212,7 @@ class _LoginState extends State<LogIn> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Text(
-                            "Sign up",
+                            "Kayıt Ol",
                             style: TextStyle(
                                 color: Color(0xFF621d3c),
                                 fontSize: 18.0,
